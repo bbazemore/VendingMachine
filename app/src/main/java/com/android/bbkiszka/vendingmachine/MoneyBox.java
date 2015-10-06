@@ -46,23 +46,22 @@ public class MoneyBox {
 
     public Boolean purchase( int itemCost) {
         Boolean purchaseComplete = false;
-        int moneyUsed = 0;
         int remainingCost = itemCost;
         if (itemCost <= mMoneyCollected) {
             // remove item cost coin by coin, we may end up taking
             // an extra coin if for some reason the price is smaller than
             // the smallest valid coin, e.g. 4 cents.
-            while (moneyUsed < itemCost) {
+            while (remainingCost > 0 && remainingCost <= itemCost) {
                 int useCoin = mCoinage.getLargestCoin(remainingCost);
                 if (useCoin == 0) {
                     useCoin = mCoinage.getSmallestCoin();
                 }
                 mMoneyCollected -= useCoin;
-                moneyUsed += useCoin;
-                Log.d(LOG_TAG, "Money used: " + moneyUsed + " after deducting " + useCoin);
+                remainingCost -= useCoin;
+                Log.d(LOG_TAG, "Balance: " + mMoneyCollected + " after deducting " + useCoin);
             }
             purchaseComplete = true;
-            Log.d(LOG_TAG, "Purchase of " + itemCost + " complete. Used " + moneyUsed + ", Balance: " + mMoneyCollected);
+            Log.d(LOG_TAG, "Purchase of " + itemCost + " complete. Used " + mMoneyCollected + ", Balance: " + mMoneyCollected);
         }
         return purchaseComplete;
     }

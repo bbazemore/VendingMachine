@@ -16,7 +16,7 @@ public class Coinage {
 
     public  Coinage() {
         // default to US nickel, dime, quarter, Susan B. Anthony /Sacajawea
-        mSupportedCoins= new ArrayList<Integer>(Arrays.asList(5,10,25,100));
+        mSupportedCoins = new ArrayList<>(Arrays.asList(5, 10, 25, 100));
     }
     public Coinage(List<Integer> coinValues) {
         // use the coin values provided
@@ -48,10 +48,11 @@ public class Coinage {
     // provided value, return 0.
     public int getLargestCoin(int value) {
         int largestCoinValue = 0;
-        ListIterator<Integer> iter = mSupportedCoins.listIterator();
+        // Start at the end position of the list and work back
+        ListIterator<Integer> iter = mSupportedCoins.listIterator(mSupportedCoins.size());
         while (iter.hasPrevious()) {
             int coinValue = iter.previous();
-            if (value <= coinValue)  {
+            if (value >= coinValue) {
                 largestCoinValue = coinValue;
                 break;
             }

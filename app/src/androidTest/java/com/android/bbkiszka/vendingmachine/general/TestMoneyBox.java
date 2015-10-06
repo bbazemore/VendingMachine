@@ -55,6 +55,13 @@ public class TestMoneyBox extends AndroidTestCase {
     }
 
     public void testRefund() {
+        // Set up a current balance of 140
+        moneyBox.insertCoin(100);
+        moneyBox.insertCoin(25);
+        moneyBox.insertCoin(10);
+        moneyBox.insertCoin(5);
+        assertEquals("Balance after inserting coins 140", 140, moneyBox.getCurrentBalance());
+        // Now ask for a refund of the balance
         assertEquals("Test refund returns balance", 140, moneyBox.refund());
         assertEquals("Test refund zeroes balance", 0, moneyBox.getCurrentBalance());
     }
@@ -64,15 +71,24 @@ public class TestMoneyBox extends AndroidTestCase {
         assertTrue("Insert Quarter 2", moneyBox.insertCoin(25));
         assertTrue("Insert Quarter 3", moneyBox.insertCoin(25));
         assertTrue("Insert Dollar", moneyBox.insertCoin(100));
+        assertEquals("Balance after inserting coins 175", 175, moneyBox.getCurrentBalance());
     }
 
     public void testPurchase() {
-        // we have 175 left from previous test
+        // Set up a current balance of 175
+        moneyBox.insertCoin(100);
+        moneyBox.insertCoin(25);
+        moneyBox.insertCoin(25);
+        moneyBox.insertCoin(25);
+        assertEquals("Balance after inserting coins 175", 175, moneyBox.getCurrentBalance());
+
         assertFalse("Try to purchase without sufficient funds 1.", moneyBox.purchase(300));
         assertFalse("Try to purchase without sufficient funds 2.", moneyBox.purchase(3000000));
         assertFalse("Try to purchase without sufficient funds 3.", moneyBox.purchase(176));
+        assertEquals("Balance after invalid purchases 175", 175, moneyBox.getCurrentBalance());
 
         assertTrue("Try to purchase with sufficient funds free!", moneyBox.purchase(0));
+        assertEquals("Balance after purchase 175", 175, moneyBox.getCurrentBalance());
         assertTrue("Try to purchase with sufficient funds cheap", moneyBox.purchase(5));
         assertEquals("Balance after purchase 170", 170, moneyBox.getCurrentBalance());
         assertTrue("Try to purchase with sufficient funds dime", moneyBox.purchase(10));
