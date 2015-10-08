@@ -1,5 +1,8 @@
 package com.android.bbkiszka.vendingmachine;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +14,7 @@ import java.util.ListIterator;
  * Values are in pennies.
  * Avoid dollars since floats are imprecise and BigDecimal is more complex than needed for this exercise.
  */
-public class Coinage {
+public class Coinage implements Parcelable {
     List<Integer> mSupportedCoins;
 
     public  Coinage() {
@@ -66,4 +69,46 @@ public class Coinage {
         else
             return mSupportedCoins.get(0);
     }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(mSupportedCoins);
+    }
+
+    private Coinage(Parcel in) {
+        in.readList(mSupportedCoins, List.class.getClassLoader());
+    }
+/*
+    public final Parcelable.Creator<Coinage> CREATOR = new Parcelable.Creator<Coinage>() {
+        @Override
+        public Coinage createFromParcel(Parcel parcel) {
+            return new Coinage(parcel);
+        }
+
+        @Override
+        public Coinage[] newArray(int i) {
+            return new Coinage[i];
+        }
+
+    };
+    */
 }
