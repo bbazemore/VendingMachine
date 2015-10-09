@@ -29,12 +29,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_toRightOf="@+id/vending_insert_coin"
-        android:columnWidth="150dp"
+        android:columnWidth="60dp"
         android:numColumns="auto_fit"
         android:verticalSpacing="0dp"
         android:horizontalSpacing="0dp"
         android:stretchMode="columnWidth"
-        android:background="@mipmap/ic_launcher"
         tools:context=".MainActivityFragment"
         android:id="@+id/vending_grid">
     </GridView>

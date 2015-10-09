@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.android.bbkiszka.vendingmachine.R;
 import com.android.bbkiszka.vendingmachine.VendingItem;
-import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -35,14 +34,14 @@ public class VendingItemAdapter extends ArrayAdapter<VendingItem> {
     public VendingItemAdapter(Activity context, List<VendingItem> inventory) {
         // Here, we initialize the ArrayAdapter's internal storage for the context and the list.
         // the second argument is used when the ArrayAdapter is populating a single TextView.
-        // Because this is a custom adapter for two TextViews and an ImageView, the adapter is not
+        // Because this is a custom adapter for a TextView and an ImageView, the adapter is not
         // going to use this second argument, so it can be any value. Here, we used 0.
         super(context, 0, inventory);
-        NumberFormat mPriceFormat = NumberFormat.getCurrencyInstance();
+        mPriceFormat = NumberFormat.getCurrencyInstance();
 
-        // we have the data from the start.  Go ahead and display it.
+        // we have the data from the start, so it will be displayed as soon
+        // as we are hooked into the grid.
         // In RESTful situations addAll may be called later.
-        addAll(inventory);
     }
 
     public void addAll(List<VendingItem> inventory) {
@@ -81,16 +80,17 @@ public class VendingItemAdapter extends ArrayAdapter<VendingItem> {
             mViewHolder = new ItemViewHolder(convertView);
         }
 
-        // Display the price with the product
-        mViewHolder.priceView.setText(mPriceFormat.format(item.getPrice()));
-
+        // Display the price with the product. Change from pennies to dollars
+        String price = mPriceFormat.format((double) item.getPrice() / 100);
+        mViewHolder.priceView.setText(price);
+        mViewHolder.productView.setImageResource(item.getImageId());
         // Display the image of the product - let Picasso paint the corners :)
-        Picasso.with(convertView.getContext())
+       /* Picasso.with(convertView.getContext())
                 .load(item.getImageId())
                         //.placeholder(R.mipmap.ic_launcher) too busy looking
                 .error(R.mipmap.ic_error)         // optional
                 .into(mViewHolder.productView);
-
+        */
         return convertView;
     }
 

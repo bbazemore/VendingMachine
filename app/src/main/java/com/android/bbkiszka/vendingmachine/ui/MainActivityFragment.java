@@ -74,7 +74,7 @@ public class MainActivityFragment extends Fragment {
         ArrayList<VendingItem> itemList = new ArrayList(Arrays.asList(itemArray));
         mAdapter = new VendingItemAdapter(getActivity(), itemList);
         mGridView = (GridView) mRootView.findViewById(R.id.vending_grid);
-
+        mGridView.setAdapter(mAdapter);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {

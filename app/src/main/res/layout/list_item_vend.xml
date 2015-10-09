@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/list_item_slot_view"
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/list_item_slot_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
     <ImageView android:id="@+id/list_item_imageview"
-               xmlns:android="http://schemas.android.com/apk/res/android"
-               android:layout_width="match_parent"
+               android:layout_width="wrap_content"
                android:layout_height="wrap_content"
-               android:layout_gravity="center_vertical"
+               android:layout_gravity="center"
                android:minHeight="?android:attr/listPreferredItemHeight">
     </ImageView>
     <TextView
         android:id="@+id/list_item_price"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="16dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:gravity="center|bottom"
+        android:layout_below="@+id/list_item_imageview"
+        android:background="@android:color/background_light"
+        style="@style/DetailShadowedText"
         android:text="@string/price"/>
 </RelativeLayout>
