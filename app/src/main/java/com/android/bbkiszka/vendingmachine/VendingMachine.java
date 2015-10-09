@@ -3,8 +3,6 @@ package com.android.bbkiszka.vendingmachine;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,7 +21,8 @@ public class VendingMachine extends Observable implements Parcelable {
     ConcurrentHashMap<Integer, VendingItem> mInventory;
     MoneyBox                mMoneyBox;
 
-    public VendingMachine(List<VendingItem> inventory) {
+
+    public VendingMachine(VendingItem[] inventory) {
 
         // set up money box with default coinage
         mMoneyBox = new MoneyBox(new Coinage());
@@ -31,6 +30,21 @@ public class VendingMachine extends Observable implements Parcelable {
         // set up inventory of VendingItems so that we can look them
         // up by unique id, which is the image resource id.
         setInventory(inventory);
+    }
+
+    public static VendingItem[] getDefaultInventory() {
+        VendingItem[] inventory = {
+                new VendingItem(R.mipmap.ic_candy_cat, 100, 3),  //0
+                new VendingItem(R.mipmap.ic_candy_honeycomb, 20, 5), // 1
+                new VendingItem(R.mipmap.ic_candy_ice_cream_sandwich, 30, 10), // 2
+                new VendingItem(R.mipmap.ic_candy_jellybean, 4, 100), // 3
+                new VendingItem(R.mipmap.ic_candy_kitkat, 55, 5), // 4
+                new VendingItem(R.mipmap.ic_candy_lollipop, 0, 50), // 5   Free!
+                new VendingItem(R.mipmap.ic_car_crosstek, 20, 2), // 6
+                new VendingItem(R.mipmap.ic_car_elantra, 30, 1), // 7
+                new VendingItem(R.mipmap.ic_car_fit_electric, 80, 3), // 8
+                new VendingItem(R.mipmap.ic_car_prius, 60, 4)}; // 9
+        return inventory;
     }
 
     public static final Creator<VendingMachine> CREATOR = new Creator<VendingMachine>() {
@@ -44,7 +58,6 @@ public class VendingMachine extends Observable implements Parcelable {
             return new VendingMachine[size];
         }
     };
-
 
     public Boolean insertCoin(int value) {
         return mMoneyBox.insertCoin(value);
@@ -91,7 +104,7 @@ public class VendingMachine extends Observable implements Parcelable {
 
     // Restocking allows us to clear out old (expired) items.
     // The inventory passed in is the complete list of what the machine now has.
-    public void setInventory(List<VendingItem> inventory) {
+    public void setInventory(VendingItem[] inventory) {
         mInventory = new ConcurrentHashMap<Integer, VendingItem>();
         for (VendingItem item : inventory) {
             // Store item in inventory so it can be fetched out by item id
@@ -134,17 +147,20 @@ public class VendingMachine extends Observable implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         mMoneyBox.writeToParcel(dest, flags);
-        dest.writeList((ArrayList<VendingItem>) mInventory.values());
+        dest.writeInt(mInventory.size());
+        Object[] valuesToWrite = mInventory.values().toArray();
+        dest.writeArray(valuesToWrite);
     }
 
     private VendingMachine(Parcel in) {
         mMoneyBox = in.readParcelable(MoneyBox.class.getClassLoader());
-        ArrayList<VendingItem> inventory = new ArrayList<VendingItem>();
-        in.readList(inventory, ArrayList.class.getClassLoader());
+        VendingItem[] inventory = (VendingItem[]) in.readArray(VendingItem.class.getClassLoader());
         setInventory(inventory);
     }
 
-    private ArrayList<VendingItem> getInventory() {
-        return (ArrayList<VendingItem>) mInventory.values();
+    public VendingItem[] getInventory() {
+        VendingItem[] inventoryItems = new VendingItem[mInventory.size()];
+        mInventory.values().toArray(inventoryItems);
+        return inventoryItems;
     }
 }

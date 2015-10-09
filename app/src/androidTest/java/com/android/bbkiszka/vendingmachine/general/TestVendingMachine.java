@@ -6,31 +6,29 @@ import com.android.bbkiszka.vendingmachine.R;
 import com.android.bbkiszka.vendingmachine.VendingItem;
 import com.android.bbkiszka.vendingmachine.VendingMachine;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Give the VendingMachine a run for the money
  */
 public class TestVendingMachine extends AndroidTestCase {
     public static final String TAG = TestMoneyBox.class.getSimpleName();
     private VendingMachine vendingMachine;
-    private List<VendingItem> inventory;
+    private VendingItem[] inventory;
 
     public void setUp() {
         // set the vending machine up with some inventory
         // item initialization specifies image resource id, price, quantity
-        inventory = new ArrayList<VendingItem>();
-        inventory.add(new VendingItem(R.mipmap.ic_candy_cat, 100, 3));  //0
-        inventory.add(new VendingItem(R.mipmap.ic_candy_honeycomb, 20, 5)); // 1
-        inventory.add(new VendingItem(R.mipmap.ic_candy_ice_cream_sandwich, 30, 10)); // 2
-        inventory.add(new VendingItem(R.mipmap.ic_candy_jellybean, 4, 100)); // 3
-        inventory.add(new VendingItem(R.mipmap.ic_candy_kitkat, 55, 5)); // 4
-        inventory.add(new VendingItem(R.mipmap.ic_candy_lollipop, 0, 50)); // 5   Free!
-        inventory.add(new VendingItem(R.mipmap.ic_car_crosstek, 20, 2)); // 6
-        inventory.add(new VendingItem(R.mipmap.ic_car_elantra, 30, 1)); // 7
-        inventory.add(new VendingItem(R.mipmap.ic_car_fit_electric, 80, 3)); // 8
-        inventory.add(new VendingItem(R.mipmap.ic_car_prius, 60, 4)); // 9
+        inventory = new VendingItem[]{
+                new VendingItem(R.mipmap.ic_candy_cat, 100, 3),  //0
+                new VendingItem(R.mipmap.ic_candy_honeycomb, 20, 5), // 1
+                new VendingItem(R.mipmap.ic_candy_ice_cream_sandwich, 30, 10), // 2
+                new VendingItem(R.mipmap.ic_candy_jellybean, 4, 100), // 3
+                new VendingItem(R.mipmap.ic_candy_kitkat, 55, 5), // 4
+                new VendingItem(R.mipmap.ic_candy_lollipop, 0, 50), // 5   Free!
+                new VendingItem(R.mipmap.ic_car_crosstek, 20, 2), // 6
+                new VendingItem(R.mipmap.ic_car_elantra, 30, 1), // 7
+                new VendingItem(R.mipmap.ic_car_fit_electric, 80, 3), // 8
+                new VendingItem(R.mipmap.ic_car_prius, 60, 4)  // 9
+        };
         vendingMachine = new VendingMachine(inventory);
     }
 
@@ -39,7 +37,7 @@ public class TestVendingMachine extends AndroidTestCase {
         assertFalse("Purchasing with no money returns false",
                 vendingMachine.vendItem(R.mipmap.ic_car_fit_electric));
         assertTrue("Purchasing free item with no money returns true",
-                vendingMachine.vendItem(inventory.get(5).getId()));
+                vendingMachine.vendItem(R.mipmap.ic_candy_lollipop));
     }
 
     // try vending some things with some, but not enough money
@@ -57,7 +55,7 @@ public class TestVendingMachine extends AndroidTestCase {
         assertEquals("Balance after no-cost purchase should be 35 cents", 35, vendingMachine.getCurrentBalance());
 
         assertFalse("Purchasing with not enough money returns false #2",
-                vendingMachine.vendItem(inventory.get(9).getId()));
+                vendingMachine.vendItem(R.mipmap.ic_car_prius));
         assertEquals("Balance after failed purchase should be 35 cents", 35, vendingMachine.getCurrentBalance());
 
     }
@@ -125,8 +123,7 @@ public class TestVendingMachine extends AndroidTestCase {
 
         // Restock with just one item.  This should clear all previous inventory.
         // Buy the item twice, try to buy an item that is not in the inventory.
-        List<VendingItem> testInventory = new ArrayList<VendingItem>();
-        testInventory.add(new VendingItem(R.mipmap.ic_candy_cat, 100, 1));  //0
+        VendingItem[] testInventory = {new VendingItem(R.mipmap.ic_candy_cat, 100, 1)};
         vendingMachine.setInventory(testInventory);
 
         assertEquals("Inventory after only one item stocked should be 1", 1, vendingMachine.itemCount(R.mipmap.ic_candy_cat));

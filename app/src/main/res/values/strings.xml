@@ -1,4 +1,9 @@
 <resources>
-    <string name="app_name">VendingMachine</string>
+    <string name="app_name">Vending Machine</string>
     <string name="action_settings">Settings</string>
+    <string name="price">Price</string>
+    <string name="float_ad">Brought to you by Barbara Bazemore Kiszka</string>
+    <string name="key_vending_state" translatable="false">
+        com.android.bbkiszka.vendingmachine.state
+    </string>
 </resources>
