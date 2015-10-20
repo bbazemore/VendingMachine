@@ -8,7 +8,7 @@ import android.util.Log;
 public class SoldOutEvent {
     private final static String TAG = SoldOutEvent.class.getSimpleName();
 
-    public int itemId;
+    public final int itemId;
 
     public SoldOutEvent(int id) {
         Log.i(TAG, "SoldOutEvent created");

@@ -10,8 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.android.bbkiszka.vendingmachine.R;
+import com.android.debug.hv.ViewServer;
 
 public class MainActivity extends AppCompatActivity {
+    public final static String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,9 +29,12 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, R.string.float_ad, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-
         });
+
+        // For debugging - View Hierarchy
+        ViewServer.get(this).addWindow(this);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -37,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -52,4 +58,15 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void onPause() {
+        super.onPause();
+        ViewServer.get(this).removeWindow(this);
+    }
+
+    public void onResume() {
+        super.onResume();
+        ViewServer.get(this).setFocusedWindow(this);
+    }
+
 }

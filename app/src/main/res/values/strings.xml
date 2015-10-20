@@ -6,4 +6,12 @@
     <string name="key_vending_state" translatable="false">
         com.android.bbkiszka.vendingmachine.state
     </string>
+    <string name="vend_balance_default">Insert Coins</string>
+    <string name="vend_purchase_complete">Thank you for your purchase.</string>
+    <string name="vend_insufficient_funds">Please insert %s more to purchase this item.</string>
+    <string name="vend_sold_out">Sold out</string>
+    <string name="vend_refund_notice">Refunded %s</string>
+    <string name="desc_insert_coin_button">Insert coin button</string>
+    <string name="desc_refund">Refund button</string>
+    <string name="desc_vend_item_picture">Picture of vending item</string>
 </resources>

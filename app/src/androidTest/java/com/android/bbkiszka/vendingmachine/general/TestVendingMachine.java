@@ -81,6 +81,7 @@ public class TestVendingMachine extends AndroidTestCase {
                 vendingMachine.vendItem(R.mipmap.ic_candy_jellybean));
         assertEquals("Balance after Jellybean purchase should be 255 cents", 255, vendingMachine.getCurrentBalance());
     }
+
     // try vending some things exact money
     public void testVendWithExactMoney() {
         vendingMachine.insertCoin(25);

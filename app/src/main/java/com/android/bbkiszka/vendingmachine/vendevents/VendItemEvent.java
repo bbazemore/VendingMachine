@@ -8,7 +8,7 @@ import android.util.Log;
 public class VendItemEvent {
     private final static String TAG = VendItemEvent.class.getSimpleName();
 
-    public int itemId;
+    public final int itemId;
     //public int price;
 
     public VendItemEvent(int id) {

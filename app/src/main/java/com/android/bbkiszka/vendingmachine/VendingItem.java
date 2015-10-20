@@ -10,8 +10,8 @@ import android.os.Parcelable;
  * For now, just keeping it simple
  */
 public class VendingItem implements Parcelable {
-    int mImageResourceId; // picture of the item to sell, also serves as the unique id
-    int   mPrice; // price charged for the item
+    final int mImageResourceId; // picture of the item to sell, also serves as the unique id
+    int mPrice; // price charged for the item
     int mQuantity; // number of this type of item in stock.
     // int   mRestockThreshold; // when stock of this item gets this low, notify the vendor
 
@@ -31,11 +31,12 @@ public class VendingItem implements Parcelable {
         mQuantity = quantity;
     }
 
-    private VendingItem(Parcel in){
+    private VendingItem(Parcel in) {
         mImageResourceId = in.readInt();
         mPrice = in.readInt();
         mQuantity = in.readInt();
     }
+
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(mImageResourceId);
         parcel.writeInt(mPrice);
@@ -66,8 +67,14 @@ public class VendingItem implements Parcelable {
         // To keep it simple, just use the image resource id, which should be unique for this app.
         return mImageResourceId;
     }
-    public int getImageId() {return mImageResourceId;}
-    public int getPrice() {return mPrice;}
+
+    public int getImageId() {
+        return mImageResourceId;
+    }
+
+    public int getPrice() {
+        return mPrice;
+    }
 
     public void setPrice(int price) {
         mPrice = price;

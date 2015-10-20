@@ -3,6 +3,7 @@ package com.android.bbkiszka.vendingmachine;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,18 +17,22 @@ import java.util.ListIterator;
  */
 public class Coinage implements Parcelable {
     List<Integer> mSupportedCoins;
+    static final NumberFormat mPriceFormat = NumberFormat.getCurrencyInstance();
 
-    public  Coinage() {
+    public Coinage() {
         // default to US nickel, dime, quarter, Susan B. Anthony /Sacajawea
         mSupportedCoins = new ArrayList<>(Arrays.asList(5, 10, 25, 100));
     }
+
     public Coinage(List<Integer> coinValues) {
         // use the coin values provided
-        mSupportedCoins= coinValues;
+        mSupportedCoins = coinValues;
     }
+
     public void clear() {
         mSupportedCoins.clear();
     }
+
     public void addCoin(Integer coinValue) {
         // Make sure we don't duplicate the coin in the coin collection
         if (!mSupportedCoins.contains(coinValue)) {
@@ -37,13 +42,18 @@ public class Coinage implements Parcelable {
             Collections.sort(mSupportedCoins);
         }
     }
+
     // Take a whole list of coins for convenience
-    public void addCoin(List<Integer> coinValueList){
-        for (Integer coin: coinValueList) addCoin(coin);
+    public void addCoin(List<Integer> coinValueList) {
+        for (Integer coin : coinValueList) addCoin(coin);
     }
 
     public boolean isValidCoin(Integer testCoin) {
         return mSupportedCoins.contains(testCoin);
+    }
+
+    public static String getDisplayValue(Integer coinValue) {
+        return mPriceFormat.format((double) coinValue / 100);
     }
 
     // Find the coin that will take the biggest chunk out of value,
@@ -70,11 +80,15 @@ public class Coinage implements Parcelable {
             return mSupportedCoins.get(0);
     }
 
+    public List<Integer> getCoinList() {
+        return mSupportedCoins;
+    }
+
     /**
      * Describe the kinds of special objects contained in this Parcelable's
-     * marshalled representation.
+     * marshaled representation.
      *
-     * @return a bitmask indicating the set of special object types marshalled
+     * @return a bitmask indicating the set of special object types marshaled
      * by the Parcelable.
      */
     @Override
@@ -97,7 +111,7 @@ public class Coinage implements Parcelable {
     private Coinage(Parcel in) {
         in.readList(mSupportedCoins, List.class.getClassLoader());
     }
-/*
+
     public final Parcelable.Creator<Coinage> CREATOR = new Parcelable.Creator<Coinage>() {
         @Override
         public Coinage createFromParcel(Parcel parcel) {
@@ -110,5 +124,5 @@ public class Coinage implements Parcelable {
         }
 
     };
-    */
+
 }

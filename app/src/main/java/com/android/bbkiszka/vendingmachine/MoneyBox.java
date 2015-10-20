@@ -10,14 +10,18 @@ import android.util.Log;
 public class MoneyBox implements Parcelable {
     private final String LOG_TAG = MoneyBox.class.getSimpleName();
     Coinage mCoinage;
-    int     mMoneyCollected; // sum of money inserted into the box
+    int mMoneyCollected; // sum of money inserted into the box
 
-    public  MoneyBox(Coinage coinage) {
+    public MoneyBox(Coinage coinage) {
         mCoinage = coinage;
         mMoneyCollected = 0;
     }
 
-    // TODO: allow different coin combinations in Settings
+    // TODO: allow entering different coin combinations in Settings
+    public Coinage getCoinage() {
+        return mCoinage;
+    }
+
     public void setCoinage(Coinage newCoinage) {
         mCoinage = newCoinage;
     }
@@ -44,31 +48,36 @@ public class MoneyBox implements Parcelable {
 
     // pushing the refund button expels all coins from the box
     // New total is 0
-    public int refund()
-    {
+    public int refund() {
         int refund = mMoneyCollected;
         mMoneyCollected = 0;
         return refund;
     }
-    public int getCurrentBalance() { return mMoneyCollected;}
 
-    public Boolean purchase( int itemCost) {
+    public int getCurrentBalance() {
+        return mMoneyCollected;
+    }
+
+    public Boolean purchase(int itemCost) {
         Boolean purchaseComplete = false;
         int remainingCost = itemCost;
         if (itemCost <= mMoneyCollected) {
             // remove item cost coin by coin, we may end up taking
             // an extra coin if for some reason the price is smaller than
             // the smallest valid coin, e.g. 4 cents.
-            while (remainingCost > 0 && remainingCost <= itemCost) {
+            while (remainingCost > 0) {
                 int useCoin = mCoinage.getLargestCoin(remainingCost);
                 if (useCoin == 0) {
                     useCoin = mCoinage.getSmallestCoin();
                 }
+                if (useCoin == 0) break; // something is wrong, empty coin set?, should ASSERT
                 mMoneyCollected -= useCoin;
                 remainingCost -= useCoin;
                 Log.d(LOG_TAG, "Balance: " + mMoneyCollected + " after deducting " + useCoin);
             }
-            purchaseComplete = true;
+            if (remainingCost <= 0) {
+                purchaseComplete = true;
+            }
             Log.d(LOG_TAG, "Purchase of " + itemCost + " complete. Used " + mMoneyCollected + ", Balance: " + mMoneyCollected);
         }
         return purchaseComplete;
@@ -76,9 +85,9 @@ public class MoneyBox implements Parcelable {
 
     /**
      * Describe the kinds of special objects contained in this Parcelable's
-     * marshalled representation.
+     * marshaled representation.
      *
-     * @return a bitmask indicating the set of special object types marshalled
+     * @return a bitmask indicating the set of special object types marshaled
      * by the Parcelable.
      */
     @Override
@@ -103,4 +112,16 @@ public class MoneyBox implements Parcelable {
         mCoinage = in.readParcelable(Coinage.class.getClassLoader());
         mMoneyCollected = in.readInt();
     }
+
+    public static final Creator<MoneyBox> CREATOR = new Creator<MoneyBox>() {
+        @Override
+        public MoneyBox createFromParcel(Parcel in) {
+            return new MoneyBox(in);
+        }
+
+        @Override
+        public MoneyBox[] newArray(int size) {
+            return new MoneyBox[size];
+        }
+    };
 }

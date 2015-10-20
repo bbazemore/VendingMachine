@@ -8,10 +8,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.bbkiszka.vendingmachine.Coinage;
 import com.android.bbkiszka.vendingmachine.R;
 import com.android.bbkiszka.vendingmachine.VendingItem;
 
-import java.text.NumberFormat;
 import java.util.List;
 
 /*
@@ -20,7 +20,6 @@ import java.util.List;
 public class VendingItemAdapter extends ArrayAdapter<VendingItem> {
     private static final String LOG_TAG = VendingItemAdapter.class.getSimpleName();
 
-    NumberFormat mPriceFormat;
     ItemViewHolder mViewHolder;
 
     /**
@@ -37,7 +36,6 @@ public class VendingItemAdapter extends ArrayAdapter<VendingItem> {
         // Because this is a custom adapter for a TextView and an ImageView, the adapter is not
         // going to use this second argument, so it can be any value. Here, we used 0.
         super(context, 0, inventory);
-        mPriceFormat = NumberFormat.getCurrencyInstance();
 
         // we have the data from the start, so it will be displayed as soon
         // as we are hooked into the grid.
@@ -81,7 +79,7 @@ public class VendingItemAdapter extends ArrayAdapter<VendingItem> {
         }
 
         // Display the price with the product. Change from pennies to dollars
-        String price = mPriceFormat.format((double) item.getPrice() / 100);
+        String price = Coinage.getDisplayValue(item.getPrice());
         mViewHolder.priceView.setText(price);
         mViewHolder.productView.setImageResource(item.getImageId());
         // Display the image of the product - let Picasso paint the corners :)
@@ -97,8 +95,8 @@ public class VendingItemAdapter extends ArrayAdapter<VendingItem> {
     // Handy dandy little class to cache the View ids so we don't keep looking for them every
     // time we refresh the UI.  We only need to fetch them after the inflate in onCreateView
     class ItemViewHolder {
-        TextView priceView;
-        ImageView productView;
+        final TextView priceView;
+        final ImageView productView;
 
         ItemViewHolder(View rootView) {
             priceView = (TextView) rootView.findViewById(R.id.list_item_price);

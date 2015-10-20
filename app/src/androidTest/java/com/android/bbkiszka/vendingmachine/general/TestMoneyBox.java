@@ -28,8 +28,7 @@ public class TestMoneyBox extends AndroidTestCase {
     /*
     Start testing with the programmer's favorite start number - zero.
      */
-    public void testBalanceIsInitiallyZero()
-    {
+    public void testBalanceIsInitiallyZero() {
         assertEquals("Balance of money box is initially zero",
                 0,
                 moneyBox.getCurrentBalance());

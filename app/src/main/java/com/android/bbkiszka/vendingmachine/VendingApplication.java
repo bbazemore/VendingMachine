@@ -3,6 +3,7 @@ package com.android.bbkiszka.vendingmachine;
 import android.app.Application;
 
 import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
 
 /**
@@ -12,7 +13,8 @@ import com.squareup.otto.Bus;
 public class VendingApplication extends Application {
     private final static String TAG = VendingApplication.class.getSimpleName();
 
-    public static Bus mBus = new Bus(); // we can get fancy later and allow injection BusProvider.getInstance();
+    // Event bus used to communicate between threads
+    public final static Bus mBus = new Bus(ThreadEnforcer.ANY); // we can get fancy later and allow injection BusProvider.getInstance();
 
     @Override
     public void onCreate() {
