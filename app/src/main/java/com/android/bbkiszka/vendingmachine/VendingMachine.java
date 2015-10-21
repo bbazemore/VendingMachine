@@ -1,13 +1,17 @@
 package com.android.bbkiszka.vendingmachine;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 
 import com.android.bbkiszka.vendingmachine.vendevents.InsufficientFundsEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.InventoryChangedEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.SoldOutEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.VendItemEvent;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -206,5 +210,22 @@ public class VendingMachine extends Observable implements Parcelable {
         if (null != mMoneyBox)
             return mMoneyBox.getCoinage();
         return null;
+    }
+
+    public void setCoinage(Coinage coinage) {
+        if (null != mMoneyBox)
+            mMoneyBox.setCoinage(coinage);
+    }
+
+    public void setCoinage(List<Integer> coinList) {
+        if (null != mMoneyBox)
+            mMoneyBox.setCoinage(new Coinage(coinList));
+    }
+
+    public static Coinage getPreferredCoinage(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String coinValueStrings = prefs.getString(context.getString(R.string.pref_coin_value_key),
+                context.getString(R.string.pref_coin_value_default_value));
+        return new Coinage(Coinage.getCoinListFromString(coinValueStrings));
     }
 }

@@ -77,7 +77,15 @@
     <string name="pref_restock_key" translatable="false">
         com.android.bbkiszka.vendingmachine.restock.button
     </string>
-    <string name="restock_summary">Restock the items in the vending machine with the default
+    <string name="pref_restock_summary">Restock the items in the vending machine with the default
         assortment.
     </string>
+    <string name="pref_coin_value_title">Coin Values</string>
+    <string name="pref_coin_value_key" translatable="false">
+        com.android.bbkiszka.vendingmachine.coinvalue
+    </string>
+    <string name="pref_coin_value_hint">Provide a comma separated list of integer values
+        representing coins
+    </string>
+    <string name="pref_coin_value_default_value">5, 10, 25, 100</string>
 </resources>

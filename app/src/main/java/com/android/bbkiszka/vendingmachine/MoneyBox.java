@@ -36,6 +36,9 @@ public class MoneyBox implements Parcelable {
         if (mCoinage.isValidCoin(value)) {
             accepted = true;
             mMoneyCollected += value;
+
+            BalanceChangeEvent balanceEvent = new BalanceChangeEvent(mMoneyCollected);
+            VendingApplication.shareBus().post(balanceEvent);
         }
 
         // We don't have to worry about the money box getting full

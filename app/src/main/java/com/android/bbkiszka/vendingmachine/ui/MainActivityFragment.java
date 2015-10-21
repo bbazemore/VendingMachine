@@ -1,7 +1,8 @@
 package com.android.bbkiszka.vendingmachine.ui;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+//import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,7 @@ import com.android.bbkiszka.vendingmachine.VendingApplication;
 import com.android.bbkiszka.vendingmachine.VendingItem;
 import com.android.bbkiszka.vendingmachine.VendingMachine;
 import com.android.bbkiszka.vendingmachine.vendevents.BalanceChangeEvent;
-import com.android.bbkiszka.vendingmachine.vendevents.InsertCoinEvent;
+import com.android.bbkiszka.vendingmachine.vendevents.CoinChangeEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.InsufficientFundsEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.InventoryChangedEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.InventoryRestockRequestEvent;
@@ -93,6 +94,7 @@ public class MainActivityFragment extends Fragment {
             // Starting from scratch.  Use the defaults Luke.  That means default stock of items
             // and default United States coinage.
             mVendingMachine = new VendingMachine(VendingMachine.getDefaultInventory());
+            mVendingMachine.setCoinage(VendingMachine.getPreferredCoinage(getActivity()));
         } else {
             // Restore the vending stock as we last saw it.
             restoreState(savedInstanceState);
@@ -119,21 +121,6 @@ public class MainActivityFragment extends Fragment {
                 // expect the result of the operation to be delivered as an
                 // event later on, through the bus.
                 mVendingMachine.vendItem(item.getId());
-             /*   if (mVendingMachine.vendItem(item.getId()))
-               {
-                    // Feedback on sale
-                    String message = String.format(getString(R.string.vend_purchase_complete));
-                    updateBalance();
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                    // TODO: play an animation
-                }
-                else {
-                    // No sale because not enough money in the money box
-                    int fundsNeeded = item.getPrice() - mMoneyBox.getCurrentBalance();
-                    String message = String.format(getString(R.string.vend_insufficient_funds), Coinage.getDisplayValue(fundsNeeded));
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                }
-                */
             }
         });
 
@@ -160,7 +147,7 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int coinValue = mCoinAdapter.getItem(position);
                 mVendingMachine.insertCoin(coinValue);
-                updateBalance();
+                updateBalance();  // Because this fragment is hogging the BalanceChanged event
             }
         });
         mHolder.mInsertCoinButton.setOnClickListener(new ImageButton.OnClickListener() {
@@ -224,6 +211,9 @@ public class MainActivityFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+        // Pick up any preference changes
+        mVendingMachine.setCoinage(VendingMachine.getPreferredCoinage(getActivity()));
+
         // We are back on display. Pay attention to vending events again.
         receiveEvents();
         updateBalance();  // the only thing in the UI that changes so far
@@ -273,14 +263,12 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-    @Subscribe
-    public void onInsertCoinEvent(InsertCoinEvent event) {
-        mVendingMachine.insertCoin(event.coinValue);
-
-        // we could wait for BalanceChangeEvent, but let's keep it simple and update display now
-        updateBalance();
-    }
-
+    /*  Not used
+        @Subscribe
+        public void onInsertCoinEvent(InsertCoinEvent event) {
+            mVendingMachine.insertCoin(event.coinValue);
+        }
+    */
     @Subscribe
     public void onBalanceChangeEvent(BalanceChangeEvent event) {
         updateBalance();
@@ -347,7 +335,7 @@ public class MainActivityFragment extends Fragment {
         // Simple notification
         String message = String.format(getString(R.string.vend_insufficient_funds),
                 Coinage.getDisplayValue(event.additionalAmountRequired));
-        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
 
         // TODO: Remove, notification is noisy, obnoxious overkill for this app
         /*
@@ -377,6 +365,14 @@ public class MainActivityFragment extends Fragment {
                 .append(event.refundCoinsMessage);
 
         updateBalance();
-        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Subscribe
+    public void onCoinChangeEvent(CoinChangeEvent event) {
+        // New coin values
+        mVendingMachine.setCoinage(event.coinValueList);
+        mCoinAdapter = new CoinAdapter(getActivity(), mVendingMachine.getCoinage().getCoinList());
+        mHolder.mCoinSelectView.setAdapter(mCoinAdapter);
     }
 }

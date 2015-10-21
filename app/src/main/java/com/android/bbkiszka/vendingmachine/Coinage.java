@@ -56,6 +56,15 @@ public class Coinage implements Parcelable {
         return mPriceFormat.format((double) coinValue / 100);
     }
 
+    public static List<Integer> getCoinListFromString(String coinValueStrings) {
+        List<String> coinValueNames = Arrays.asList(coinValueStrings.split("\\s*,\\s*"));
+        List<Integer> coinValues = new ArrayList<Integer>();
+        for (String coinValueStr : coinValueNames) {
+            coinValues.add(Integer.parseInt(coinValueStr));
+        }
+        return coinValues;
+    }
+
     // Find the coin that will take the biggest chunk out of value,
     // without exceeding value. If all coins are larger than the
     // provided value, return 0.
