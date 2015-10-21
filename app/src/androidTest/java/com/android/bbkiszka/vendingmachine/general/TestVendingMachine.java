@@ -12,12 +12,12 @@ import com.android.bbkiszka.vendingmachine.VendingMachine;
 public class TestVendingMachine extends AndroidTestCase {
     public static final String TAG = TestMoneyBox.class.getSimpleName();
     private VendingMachine vendingMachine;
-    private VendingItem[] inventory;
+    // private VendingItem[] inventory;
 
     public void setUp() {
         // set the vending machine up with some inventory
         // item initialization specifies image resource id, price, quantity
-        inventory = new VendingItem[]{
+        VendingItem[] inventory = new VendingItem[]{
                 new VendingItem(R.mipmap.ic_candy_cat, 100, 3),  //0
                 new VendingItem(R.mipmap.ic_candy_honeycomb, 20, 5), // 1
                 new VendingItem(R.mipmap.ic_candy_ice_cream_sandwich, 30, 10), // 2

@@ -33,8 +33,8 @@ public class VendingMachine extends Observable implements Parcelable {
     // in the HashMap is when you are trying to iterate over it,
     // at the same time it is being updated. Thankfully we don't have to worry about that
     // for this little Vending Machine.
-    ConcurrentHashMap<Integer, VendingItem> mInventory;
-    final MoneyBox mMoneyBox;
+    private ConcurrentHashMap<Integer, VendingItem> mInventory;
+    private final MoneyBox mMoneyBox;
 
     public VendingMachine(VendingItem[] inventory) {
 

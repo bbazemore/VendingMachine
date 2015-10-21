@@ -16,8 +16,8 @@ import java.util.ListIterator;
  * Avoid dollars since floats are imprecise and BigDecimal is more complex than needed for this exercise.
  */
 public class Coinage implements Parcelable {
-    List<Integer> mSupportedCoins;
-    static final NumberFormat mPriceFormat = NumberFormat.getCurrencyInstance();
+    private List<Integer> mSupportedCoins;
+    private static final NumberFormat mPriceFormat = NumberFormat.getCurrencyInstance();
 
     public Coinage() {
         // default to US nickel, dime, quarter, Susan B. Anthony /Sacajawea
@@ -33,7 +33,7 @@ public class Coinage implements Parcelable {
         mSupportedCoins.clear();
     }
 
-    public void addCoin(Integer coinValue) {
+    private void addCoin(Integer coinValue) {
         // Make sure we don't duplicate the coin in the coin collection
         if (!mSupportedCoins.contains(coinValue)) {
             mSupportedCoins.add(coinValue);

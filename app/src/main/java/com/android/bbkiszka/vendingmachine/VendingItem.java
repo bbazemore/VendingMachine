@@ -10,9 +10,9 @@ import android.os.Parcelable;
  * For now, just keeping it simple
  */
 public class VendingItem implements Parcelable {
-    final int mImageResourceId; // picture of the item to sell, also serves as the unique id
-    int mPrice; // price charged for the item
-    int mQuantity; // number of this type of item in stock.
+    private final int mImageResourceId; // picture of the item to sell, also serves as the unique id
+    private int mPrice; // price charged for the item
+    private int mQuantity; // number of this type of item in stock.
     // int   mRestockThreshold; // when stock of this item gets this low, notify the vendor
 
     //public final static int MAX_QUANTITY = 100; // arbitrary limit to mimic physical limit

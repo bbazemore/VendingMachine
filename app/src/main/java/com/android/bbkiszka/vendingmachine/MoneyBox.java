@@ -12,15 +12,15 @@ import com.android.bbkiszka.vendingmachine.vendevents.RefundedCoinsEvent;
  */
 public class MoneyBox implements Parcelable {
     private final String LOG_TAG = MoneyBox.class.getSimpleName();
-    Coinage mCoinage;
-    int mMoneyCollected; // sum of money inserted into the box
+    private Coinage mCoinage;
+    private int mMoneyCollected; // sum of money inserted into the box
 
     public MoneyBox(Coinage coinage) {
         mCoinage = coinage;
         mMoneyCollected = 0;
     }
 
-    // TODO: allow entering different coin combinations in Settings
+    // The coins supported by this Money Box
     public Coinage getCoinage() {
         return mCoinage;
     }

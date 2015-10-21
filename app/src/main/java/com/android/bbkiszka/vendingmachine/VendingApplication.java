@@ -14,7 +14,7 @@ public class VendingApplication extends Application {
     private final static String TAG = VendingApplication.class.getSimpleName();
 
     // Event bus used to communicate between threads
-    public final static Bus mBus = new Bus(ThreadEnforcer.ANY); // we can get fancy later and allow injection BusProvider.getInstance();
+    private final static Bus mBus = new Bus(ThreadEnforcer.ANY); // we can get fancy later and allow injection BusProvider.getInstance();
 
     @Override
     public void onCreate() {
