@@ -52,8 +52,10 @@ public class TestVendingMachine extends AndroidTestCase {
 
         assertTrue("Purchasing free item with no money returns true",
                 vendingMachine.vendItem(R.mipmap.ic_candy_lollipop));
-        assertEquals("Balance after no-cost purchase should be 35 cents", 35, vendingMachine.getCurrentBalance());
+        assertEquals("Balance after no-cost purchase should be 0 cents", 0, vendingMachine.getCurrentBalance());
 
+        vendingMachine.insertCoin(25);
+        vendingMachine.insertCoin(10);
         assertFalse("Purchasing with not enough money returns false #2",
                 vendingMachine.vendItem(R.mipmap.ic_car_prius));
         assertEquals("Balance after failed purchase should be 35 cents", 35, vendingMachine.getCurrentBalance());
@@ -71,15 +73,17 @@ public class TestVendingMachine extends AndroidTestCase {
 
         assertTrue("Purchasing with more than enough money returns true",
                 vendingMachine.vendItem(R.mipmap.ic_car_fit_electric));
-        assertEquals("Balance after Fit purchase should be 320 cents", 320, vendingMachine.getCurrentBalance());
+        assertEquals("Balance after Fit purchase should be 0 cents", 0, vendingMachine.getCurrentBalance());
 
+        vendingMachine.insertCoin(100);
         assertTrue("Purchasing with more than enough money returns true #2",
                 vendingMachine.vendItem(R.mipmap.ic_car_prius));
-        assertEquals("Balance after Prius purchase should be 260 cents", 260, vendingMachine.getCurrentBalance());
+        assertEquals("Balance after Prius purchase should be 0 cents", 0, vendingMachine.getCurrentBalance());
 
+        vendingMachine.insertCoin(25);
         assertTrue("Purchasing with more than enough money returns true #3, purchase cost less than smallest coin",
                 vendingMachine.vendItem(R.mipmap.ic_candy_jellybean));
-        assertEquals("Balance after Jellybean purchase should be 255 cents", 255, vendingMachine.getCurrentBalance());
+        assertEquals("Balance after Jellybean purchase should be 0 cent", 0, vendingMachine.getCurrentBalance());
     }
 
     // try vending some things exact money
@@ -114,10 +118,13 @@ public class TestVendingMachine extends AndroidTestCase {
                 vendingMachine.vendItem(R.mipmap.ic_car_crosstek));
         assertEquals("Inventory after CrossTek purchase #1 should be 1", 1, vendingMachine.itemCount(R.mipmap.ic_car_crosstek));
 
+        // vending the item refunds any extra money.  Ensure there is enough money to cover next purchase
+        vendingMachine.insertCoin(100);
         assertTrue("Purchasing second item in stock returns true #2",
                 vendingMachine.vendItem(R.mipmap.ic_car_crosstek));
         assertEquals("Inventory after CrossTek purchase #2 should be 0", 0, vendingMachine.itemCount(R.mipmap.ic_car_crosstek));
 
+        vendingMachine.insertCoin(100);
         assertFalse("Purchasing out of stock item returns false",
                 vendingMachine.vendItem(R.mipmap.ic_car_crosstek));
         assertEquals("Inventory after CrossTek purchase #3 should still be 0", 0, vendingMachine.itemCount(R.mipmap.ic_car_crosstek));
@@ -137,10 +144,12 @@ public class TestVendingMachine extends AndroidTestCase {
                 vendingMachine.vendItem(R.mipmap.ic_car_fit_electric));
         assertEquals("Inventory after Fit purchase should be 0", 0, vendingMachine.itemCount(R.mipmap.ic_car_fit_electric));
 
+        vendingMachine.insertCoin(100);
         assertTrue("Purchasing only item in stock returns true",
                 vendingMachine.vendItem(R.mipmap.ic_candy_cat));
         assertEquals("Inventory after only item purchase should be 0", 0, vendingMachine.itemCount(R.mipmap.ic_candy_cat));
 
+        vendingMachine.insertCoin(100);
         assertFalse("Purchasing with no items in stock returns false",
                 vendingMachine.vendItem(R.mipmap.ic_candy_cat));
         assertEquals("Inventory after only item purchase should be 0", 0, vendingMachine.itemCount(R.mipmap.ic_candy_cat));

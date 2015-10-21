@@ -4,6 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.android.bbkiszka.vendingmachine.vendevents.BalanceChangeEvent;
+import com.android.bbkiszka.vendingmachine.vendevents.RefundedCoinsEvent;
+
 /**
  * Handle money going in and out of the vending machine
  */
@@ -51,6 +54,12 @@ public class MoneyBox implements Parcelable {
     public int refund() {
         int refund = mMoneyCollected;
         mMoneyCollected = 0;
+        if (refund > 0) {
+            RefundedCoinsEvent refundEvent = new RefundedCoinsEvent(refund, mCoinage.getRefundChange(refund));
+            VendingApplication.shareBus().post(refundEvent);
+            BalanceChangeEvent balanceEvent = new BalanceChangeEvent(mMoneyCollected);
+            VendingApplication.shareBus().post(balanceEvent);
+        }
         return refund;
     }
 

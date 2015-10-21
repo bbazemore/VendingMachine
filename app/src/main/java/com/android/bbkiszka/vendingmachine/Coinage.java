@@ -84,6 +84,47 @@ public class Coinage implements Parcelable {
         return mSupportedCoins;
     }
 
+    // Given a money amount, return the coins that would be returned to
+    // equal that amount
+    public String getRefundChange(int refundValue) {
+        int amountToRefund = refundValue;
+        int smallestValue = getSmallestCoin();
+        int lastCoinRefunded = 0;
+        int coinToRefund;
+        int currentCoinCount = 0;
+
+        StringBuilder refundString = new StringBuilder();
+
+        // Walk through the coin values, largest to smallest and note
+        // the number of each coin used for the refund
+        while (amountToRefund >= smallestValue) {
+            coinToRefund = getLargestCoin(amountToRefund);
+            amountToRefund -= coinToRefund;
+            if (coinToRefund == lastCoinRefunded) {
+                currentCoinCount++;
+            } else {
+                // We are done with the last coin processed
+                // Add it to the refund string "<number of coins> - <coin value>"
+                if (currentCoinCount != 0) {
+                    refundString.append(Integer.toString(currentCoinCount))
+                            .append(" - ")
+                            .append(getDisplayValue(lastCoinRefunded))
+                            .append(String.format("%n")); // system independent new line
+                }
+                // reset to this new coin
+                lastCoinRefunded = coinToRefund;
+                currentCoinCount = 1;
+            }
+        }
+        // one last time to pick up the last coin from the while loop
+        if (currentCoinCount != 0) {
+            refundString.append(Integer.toString(currentCoinCount))
+                    .append(" - ")
+                    .append(getDisplayValue(lastCoinRefunded))
+                    .append(String.format("%n")); // system independent new line
+        }
+        return refundString.toString();
+    }
     /**
      * Describe the kinds of special objects contained in this Parcelable's
      * marshaled representation.

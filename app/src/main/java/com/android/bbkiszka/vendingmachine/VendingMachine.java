@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.android.bbkiszka.vendingmachine.vendevents.InsufficientFundsEvent;
+import com.android.bbkiszka.vendingmachine.vendevents.InventoryChangedEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.SoldOutEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.VendItemEvent;
 
@@ -21,6 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VendingMachine extends Observable implements Parcelable {
     // Keep stock in a concurrent hash map, indexed by the item id
     // Concurrent hashmap has decent performance and is thread safe.
+    // see: http://crunchify.com/hashmap-vs-concurrenthashmap-vs-synchronizedmap-how-a-hashmap-can-be-synchronized-in-java/
+    //
+    // ConcurrentHashMap may be a bit of overkill for this particular app, but I need
+    // to show off that I can do Enterprise level code.  The fun part
+    // in the HashMap is when you are trying to iterate over it,
+    // at the same time it is being updated. Thankfully we don't have to worry about that
+    // for this little Vending Machine.
     ConcurrentHashMap<Integer, VendingItem> mInventory;
     final MoneyBox mMoneyBox;
 
@@ -86,6 +94,7 @@ public class VendingMachine extends Observable implements Parcelable {
                     // notify UI to vend item
                     VendItemEvent vendItem = new VendItemEvent(item.getId());
                     VendingApplication.shareBus().post(vendItem);
+                    mMoneyBox.refund(); // return any change
                 } else {
                     // don't cheat the customer, refund the amount to the money box
                     mMoneyBox.insertAmount(item.getPrice());
@@ -114,19 +123,33 @@ public class VendingMachine extends Observable implements Parcelable {
     public void updateInventoryItem(VendingItem inventoryItem) {
         mInventory.put(inventoryItem.getId(), inventoryItem);
 
-        // Notify UI there is an updated item
+        // Notify UI there is an updated item?  No, that is too many notifications
+        // in this case.
     }
 
     // Restocking allows us to clear out old (expired) items.
     // The inventory passed in is the complete list of what the machine now has.
     public void setInventory(VendingItem[] inventory) {
-        mInventory = new ConcurrentHashMap<Integer, VendingItem>();
+        // This list may have new or missing items.  If it is always the same set of items
+        // we could just update the existing hashmap (if there is one).  For now leave
+        // room for adding / removing items from inventory by creating a new HashMap each time.
+        //
+        // Don't hog more memory than necessary. Do that by being specific about how big to make the new HashMap.
+        // A single shard segment is created internally for the HashMap that allocates an
+        // initial capacity for its HashEntry[] table that matches the number of inventory items,
+        // which allows for some reasonable number of values to be added before reallocation,
+        // and the load factor of 0.9 ensures reasonably dense packing.
+        // The single shard offers full read benefits and, unless you have very high concurrency
+        // sufficient write throughput without risking crazy unnecessary memory loading.
+        // see: https://ria101.wordpress.com/2011/12/12/concurrenthashmap-avoid-a-common-misuse/
+        mInventory = new ConcurrentHashMap<Integer, VendingItem>(inventory.length, 0.9f, 1);
         for (VendingItem item : inventory) {
             // Store item in inventory so it can be fetched out by item id
             mInventory.put(item.getId(), item);
         }
 
-        // Notify UI there are new items
+        // Notify UI there are new items; id of -1 means everything changed
+        VendingApplication.shareBus().post(new InventoryChangedEvent(-1, 0, 0));
     }
 
     // Provide number of items we have in inventory for a particular item

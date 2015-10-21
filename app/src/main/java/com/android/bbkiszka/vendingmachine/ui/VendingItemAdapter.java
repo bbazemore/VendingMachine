@@ -92,6 +92,10 @@ public class VendingItemAdapter extends ArrayAdapter<VendingItem> {
         return convertView;
     }
 
+    public static void SellOut(View sellOutItemView) {
+        ImageView productView = (ImageView) sellOutItemView.findViewById(R.id.list_item_imageview);
+        productView.setImageResource(R.mipmap.ic_sold_out);
+    }
     // Handy dandy little class to cache the View ids so we don't keep looking for them every
     // time we refresh the UI.  We only need to fetch them after the inflate in onCreateView
     class ItemViewHolder {

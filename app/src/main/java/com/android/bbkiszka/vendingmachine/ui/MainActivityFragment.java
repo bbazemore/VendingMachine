@@ -18,8 +18,12 @@ import com.android.bbkiszka.vendingmachine.R;
 import com.android.bbkiszka.vendingmachine.VendingApplication;
 import com.android.bbkiszka.vendingmachine.VendingItem;
 import com.android.bbkiszka.vendingmachine.VendingMachine;
+import com.android.bbkiszka.vendingmachine.vendevents.BalanceChangeEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.InsertCoinEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.InsufficientFundsEvent;
+import com.android.bbkiszka.vendingmachine.vendevents.InventoryChangedEvent;
+import com.android.bbkiszka.vendingmachine.vendevents.InventoryRestockRequestEvent;
+import com.android.bbkiszka.vendingmachine.vendevents.RefundedCoinsEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.SoldOutEvent;
 import com.android.bbkiszka.vendingmachine.vendevents.VendItemEvent;
 import com.squareup.otto.Bus;
@@ -60,6 +64,8 @@ public class MainActivityFragment extends Fragment {
         public final ImageButton mRefundButton;
         public final ListView mCoinSelectView;
 
+        public View mItemBeingVendedView; // Cache the vending item being processed so we can update the UI
+
         public ViewHolder(View view) {
             mGridView = (GridView) view.findViewById(R.id.vending_grid);
             mBalanceView = (TextView) view.findViewById(R.id.vending_balance);
@@ -73,8 +79,8 @@ public class MainActivityFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // Set up the RESTful connection to the movie database
-        // using our buddies Retrofit and Otto.
+        // Set up the RESTful connection to the vending machine
+        // using our buddy Otto bus.
         receiveEvents();
     }
 
@@ -104,6 +110,7 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 // User clicked on the vending item at "position".
+                mHolder.mItemBeingVendedView = v;
                 // Attempt to sell the item to the user / customer
                 VendingItem item = mAdapter.getItem(position);
 
@@ -178,13 +185,11 @@ public class MainActivityFragment extends Fragment {
              */
             @Override
             public void onClick(View v) {
-                // Issue a refund
-                String message = String.format(getString(R.string.vend_refund_notice),
-                        Coinage.getDisplayValue(mVendingMachine.refund()));
-                updateBalance();
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                // Issue a refund. This will send a RefundedCoinsEvent to update the UI
+                mVendingMachine.refund();
             }
         });
+
         //mRootView.setTag(mHolder);  // not necessary since we stored it as a member variable
         return mRootView;
     }
@@ -211,6 +216,8 @@ public class MainActivityFragment extends Fragment {
         if (savedInstanceState != null) {
             mVendingMachine = savedInstanceState.getParcelable(KEY_INVENTORY_LIST);
         }
+        // purposely lose our place since the old view is probably gone
+        mHolder.mItemBeingVendedView = null;
     }
 
     @Override
@@ -275,20 +282,62 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Subscribe
+    public void onBalanceChangeEvent(BalanceChangeEvent event) {
+        updateBalance();
+    }
+
+    @Subscribe
+    public void onInventoryRestockRequestEvent(InventoryRestockRequestEvent event) {
+        Log.d(TAG, "onInventoryRestockRequestEvent received ");
+
+        // Restock the vending machine with the default items
+        mVendingMachine.setInventory(VendingMachine.getDefaultInventory());
+
+        // TODO: allow user to specify quantities in Settings, then pass the new
+        // quantities in the event
+    }
+
+    @Subscribe
+    public void onInventoryChangedEvent(InventoryChangedEvent event) {
+        Log.d(TAG, "onInventoryChangedEvent ");
+        // Get the current inventory from the VendingMachine and
+        // display it.
+        mHolder.mItemBeingVendedView = null;
+        mAdapter.addAll(mVendingMachine.getInventory());
+
+        // Possible future: fine tune and only update quantities for one item at a time
+    }
+    @Subscribe
     public void onVendItemEvent(VendItemEvent event) {
         Log.d(TAG, "onVendItemEvent ");
-        Toast.makeText(getActivity(), R.string.vend_purchase_complete, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.vend_purchase_complete, Toast.LENGTH_LONG).show();
         updateBalance();
         // TODO: Display item vended animation, use Material Design curve motion
+
+        if (mVendingMachine.itemCount(event.itemId) == 0) {
+            // post sold out icon
+            if (null != mHolder.mItemBeingVendedView) {
+                VendingItemAdapter.SellOut(mHolder.mItemBeingVendedView);
+            }
+        }
+        // done vending this item
+        mHolder.mItemBeingVendedView = null;
     }
 
     @Subscribe
     public void onSoldOutEvent(SoldOutEvent event) {
         Log.d(TAG, "onSoldOutEvent ");
 
+        // post sold out icon
+        if (null != mHolder.mItemBeingVendedView) {
+            VendingItemAdapter.SellOut(mHolder.mItemBeingVendedView);
+        }
+
         Toast.makeText(getActivity(), R.string.vend_sold_out, Toast.LENGTH_SHORT).show();
 
         // TODO: Display sold out animation, use Material Design lift motion
+        // done vending this item
+        mHolder.mItemBeingVendedView = null;
     }
 
     @Subscribe
@@ -319,4 +368,15 @@ public class MainActivityFragment extends Fragment {
         */
     }
 
+    @Subscribe
+    public void onRefundedCoinsEvent(RefundedCoinsEvent event) {
+        StringBuilder message = new StringBuilder();
+        message.append(String.format(getString(R.string.vend_refund_notice),
+                Coinage.getDisplayValue(event.refundAmount)))
+                .append(String.format("%n")) // system independent new line
+                .append(event.refundCoinsMessage);
+
+        updateBalance();
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+    }
 }
